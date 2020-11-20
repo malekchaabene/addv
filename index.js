@@ -12,7 +12,7 @@ const db = require('./config/dbconfig')
 
 // Test DB
 db.sequelize.authenticate()
-    .then(() => console.log(chalk.green.bold('Database Connected...')))
+    .then(() => console.log(chalk.green.bold('Database Connected....')))
     .catch((err) => console.log(chalk.red.bold('Error Database : ' + err)))
 
 
