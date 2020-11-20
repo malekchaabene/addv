@@ -154,7 +154,7 @@ module.exports = {
                         model: User
                     }
                 ],
-                group: 'FinishRead.userId',
+                group: ['finishread.id'],
                 order: [[Sequelize.literal('`books`'), 'DESC']],
                 //limit: 100
             })
