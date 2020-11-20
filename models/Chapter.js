@@ -1,5 +1,5 @@
 module.exports = (sequelize, Sequelize) => {
-    const Chapter = sequelize.define('Chapter', {
+    const Chapter = sequelize.define('chapter', {
         order: {
             type: Sequelize.INTEGER,
         },

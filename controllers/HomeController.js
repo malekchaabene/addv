@@ -32,6 +32,8 @@ module.exports = {
             //     res.status(200).json({ msg: encounters });
             // });
             //const books = await Book.findAll({ order: Sequelize.literal('rand()'), limit: 1 });
+            
+            
             const books = await Book.findAll({
                 subQuery: false,
                 attributes: {
@@ -46,9 +48,12 @@ module.exports = {
                         required: false,
                     }
                 ],
-                group: ['book.title'],
+                group: ['book.id'],
                 order: Sequelize.literal('rand()'), limit: 1
             })
+
+
+
             const bestBooks = await Book.findAll({
                 subQuery: false,
                 attributes: {
@@ -63,10 +68,13 @@ module.exports = {
                         required: false,
                     }
                 ],
-                group: ['book.title'],
+                group: ['book.id'],
                 order: [['createdAt', 'DESC']],
                 limit: 5
             });
+
+
+
             //const chapters = await Chapter.findByPk('1')
             // const chapters = await Chapter.findAll({
             //     //attributes: attributes,

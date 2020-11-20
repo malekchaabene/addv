@@ -59,8 +59,8 @@ db.book.hasMany(db.finishread);
 db.finishread.belongsTo(db.book);
 
 
-db.user.belongsToMany(db.book, { through: "Favories", as: "books", foreignKey: "user_id" })
-db.book.belongsToMany(db.user, { through: "Favories", as: "users", foreignKey: "book_id" })
+db.user.belongsToMany(db.book, { through: "favories", as: "books", foreignKey: "user_id" })
+db.book.belongsToMany(db.user, { through: "favories", as: "users", foreignKey: "book_id" })
 
 db.user.belongsTo(db.token);
 db.token.hasOne(db.user);

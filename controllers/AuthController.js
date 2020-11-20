@@ -16,6 +16,7 @@ module.exports = {
     ////////// Login User
     ////////////////////////////////
     async signIn(req, res) {
+        console.log("HELLLO")
         console.log("Enter : " + req.body.email)
         let { email, password } = req.body;
         User.findOne({
