@@ -69,7 +69,7 @@ module.exports = {
                         model: Chapter,
                     }
                 ],
-                group: ['book.title']
+                group: ['book.id']
             })
             res.status(200).json(books);
         } catch (error) {
