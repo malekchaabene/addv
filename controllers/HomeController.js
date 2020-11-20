@@ -169,7 +169,7 @@ module.exports = {
                         required: false,
                     }
                 ],
-                group: ['book.title'],
+                group: ['book.id'],
                 order: Sequelize.literal('rand()'),
                 limit: 1
             })
