@@ -40,9 +40,11 @@ router.post('/api/user', auth, UserController.editUser);
 
 router.get('/api/currentread', auth, UserController.currentRead);
 router.post('/api/complete/:id', auth, UserController.completeChapter);
+router.post('/api/startread/:id', auth, UserController.startChapter);
 router.post('/api/finich/:id', auth, UserController.completeBook);
 
 router.get('/api/finish', auth, UserController.finishBook);
+router.post('/api/order', auth, UserController.buyBook);
 
 
 module.exports = router;

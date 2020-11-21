@@ -112,7 +112,7 @@ module.exports = {
             const orders = await Order.findAll({
                 where: {
                     [Op.and]: [
-                        { owned: false },
+                        { owned: true },
                         { userId: req.user.id }
                     ]
                 },
@@ -154,8 +154,8 @@ module.exports = {
                         model: User
                     }
                 ],
-                group: ['finishread.id'],
-                order: [[Sequelize.literal('`books`'), 'DESC']],
+                group: 'FinishRead.userId',
+                order: [[Sequelize.literal('`point`'), 'DESC']],
                 //limit: 100
             })
 
@@ -340,11 +340,40 @@ module.exports = {
         }
     },
 
+    ////////////////////////////////
+    ////////// Start Chapter Read
+    ////////////////////////////////
+    async startChapter(req, res) {
+        console.log(chalk.redBright.bold("Start Charpter Read"))
+        try {
+
+            const read = await ReadCurrent.findOne({
+                where: {
+                    userId: { [Op.eq]: req.user.id },
+                    ChapterId: { [Op.eq]: req.params.id },
+                }
+            })
+
+            if (!read) {
+                await ReadCurrent.create({
+                    userId: req.user.id,
+                    chapterId: req.params.id,
+                    stats: false,
+                })
+            }
+
+            res.status(200).json({ msg: "Start Read Chapter", user: req.user });
+        } catch (error) {
+            res.status(500).json(error);
+        }
+    },
+
 
     ////////////////////////////////
     ////////// Complete Book Read
     ////////////////////////////////
     async completeBook(req, res) {
+        console.log(chalk.redBright.bold("Complete Book Read"))
         try {
 
             const read = await FinishRead.findOne({
@@ -361,6 +390,25 @@ module.exports = {
                     userId: req.user.id,
                     bookId: req.params.id
                 })
+
+                const readedChapter = await ReadCurrent.findAll({
+                    where: {
+                        userId: req.user.id,
+                    },
+                    include: [{
+                        model: Chapter,
+    
+                        where: {
+                            bookId: 1
+                        }
+                    },],
+                });
+                readedChapter.forEach(async (readed) => {
+                   console.log(readed.stats)
+                   readed.stats = true;
+                   await readed.save();
+                });
+
             }
 
             res.status(200).json({ msg: "Finish Read Book", user: req.user });
@@ -386,6 +434,30 @@ module.exports = {
                 ]
             })
             res.status(200).json(orders);
+        } catch (error) {
+            res.status(500).json(error);
+        }
+    },
+
+    ////////////////////////////////
+    ////////// Add TO Order
+    ////////////////////////////////
+    async buyBook(req, res) {
+        try {
+            const order = await Order.findOne({
+                where: {
+                    userId: { [Op.eq]: req.user.id },
+                    bookId: { [Op.eq]: req.body.id },
+                }
+            })
+
+            if (!order) {
+                await Order.create({
+                    userId: req.user.id,
+                    bookId: req.body.id
+                })
+            }
+            res.status(200).json({ msg: "book Added To Order", status: 1 });
         } catch (error) {
             res.status(500).json(error);
         }

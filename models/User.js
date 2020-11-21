@@ -7,7 +7,8 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.STRING
         },
         avatar: {
-            type: Sequelize.STRING
+            type: Sequelize.STRING,
+            defaultValue: "avatar.jpg"
         },
         cover: {
             type: Sequelize.STRING

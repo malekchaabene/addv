@@ -1,11 +1,13 @@
 const Sequelize = require('sequelize')
-const { Op } = require('sequelize')
+const { Op } = require('sequelize');
 const fs = require('fs')
 //Import Models
 const db = require('../config/dbconfig');
 const chalk = require('chalk');
+const { user } = require('../config/dbconfig');
 const User = db.user;
 const Book = db.book;
+const Order = db.order;
 const Chapter = db.chapter;
 const ReadCurrent = db.readcurrent
 const Rating = db.rating
@@ -32,8 +34,8 @@ module.exports = {
             //     res.status(200).json({ msg: encounters });
             // });
             //const books = await Book.findAll({ order: Sequelize.literal('rand()'), limit: 1 });
-            
-            
+
+
             const books = await Book.findAll({
                 subQuery: false,
                 attributes: {
@@ -51,6 +53,15 @@ module.exports = {
                 group: ['book.id'],
                 order: Sequelize.literal('rand()'), limit: 1
             })
+
+
+
+
+
+            
+
+
+
 
 
 
@@ -72,6 +83,35 @@ module.exports = {
                 order: [['createdAt', 'DESC']],
                 limit: 5
             });
+
+
+
+            for (let i = 0; i < bestBooks.length; i++) {
+                console.log("Check Fav -> "+bestBooks[i].id)
+                const fav = await User.findOne({
+                    where: {
+                        id: req.user.id,
+                    },
+                    include: [
+                        {
+                            model: Book,
+                            as: "books",
+                            through: {
+                                where: {
+                                    book_id: bestBooks[i].id
+                                }
+                            }
+                        }
+                    ]
+                })
+
+                if (fav.books.length > 0) {
+                    bestBooks[i].dataValues.fav = true;
+                } else {
+                    bestBooks[i].dataValues.fav = false;
+                }
+
+            }
 
 
 
@@ -121,7 +161,7 @@ module.exports = {
         try {
 
             console.log(req.body.bookid)
-            const book = await Book.findOne({
+            var book = await Book.findOne({
                 // attributes: {
                 //     // include: [
                 //     //     [Sequelize.fn('AVG', Sequelize.col('ratings.rate')), 'rates']
@@ -139,7 +179,7 @@ module.exports = {
                     // }
                 ]
             })
-            console.log(book)
+
 
             // const books = await Book.findAll({
             //     where: {
@@ -173,6 +213,63 @@ module.exports = {
                 order: Sequelize.literal('rand()'),
                 limit: 1
             })
+
+            const owned = await Order.findOne({
+                where: {
+                    userId: { [Op.eq]: req.user.id },
+                    bookId: { [Op.eq]: req.body.bookid },
+                }
+            })
+
+
+            // User.findByPk(req.user.id).then(async (user) => {
+            //     const fav = await user.getBooks({id:1});
+            //     console.log(fav)
+            // })
+
+            // const fav = await User.findOne({
+            //     where: {
+            //         id: req.user.id,
+            //     },
+            //     include: {
+            //         model: Book,
+            //         // through: {
+            //         //     where: {
+            //         //         id: 1
+            //         //     }
+            //         // }
+            //     }
+            // })
+            const fav = await User.findOne({
+                where: {
+                    id: req.user.id,
+                },
+                include: [
+                    {
+                        model: Book,
+                        as: "books",
+                        through: {
+                            where: {
+                                book_id: req.body.bookid
+                            }
+                        }
+                    }
+                ]
+            })
+
+            if (fav.books.length > 0) {
+                book.dataValues.fav = true;
+            } else {
+                book.dataValues.fav = false;
+            }
+
+            if (owned) {
+                book.dataValues.owned = true;
+            } else {
+                book.dataValues.owned = false;
+            }
+
+
 
             res.status(200).json({ book: book, books: books });
         } catch (error) {
